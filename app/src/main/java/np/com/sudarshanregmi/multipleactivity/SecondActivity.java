@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,10 +24,10 @@ public class SecondActivity extends AppCompatActivity {
     public static int[][] winningPositions = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
     public static int[][] validMoves = {{1, 3, 4}, {0, 2, 4}, {1, 4, 5}, {0, 4, 6}, {0, 1, 2, 3, 4, 5, 6, 7, 8}, {8, 2, 4}, {3, 7, 4}, {6, 8, 4}, {5, 7, 4}};
     public static int DEPTH;
-    public static ArrayList<Integer> best_move = new ArrayList<>();
-    public static ArrayList<ArrayList<Integer>> coords = new ArrayList<>();
+    public static ArrayList<ArrayList<Integer>> coords = new ArrayList<>(0);
     int pickedTappedCounter = -1;
     ImageView one, two, three, four, five, six, seven, eight, nine;
+    android.support.v7.widget.GridLayout parentView ;
     int width;
 
 
@@ -41,21 +40,23 @@ public class SecondActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean restrictRule(int tappedCounter){
+    public boolean restrictRule(int tappedCounter){
         return tappedCounter == 4 && isBoardEmpty(board) && !canMove(board);
     }
 
     private int getNearestNode(float x, float y) {
         int index = -1;
         int temp = 1000000;
-        System.out.println(coords.size());
+        System.out.println("width is "+width);
         for (int i = 0; i < coords.size(); i++) {
             int distance = (int) Math.hypot(x - coords.get(i).get(0) - width, y - coords.get(i).get(1) - width);
+            System.out.println("current distance "+distance);
             if (distance < temp) {
                 temp = distance;
                 index = i;
             }
         }
+        System.out.println(temp+" is distance"+" index=> "+index);
         return index;
     }
 
@@ -71,7 +72,6 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void fillBoard(int tappedCounter, ImageView counter){
-        android.support.v7.widget.GridLayout parentView = findViewById(R.id.gridLayout);
         board[tappedCounter] = player;
         counter.setImageResource(R.drawable.blue_circle);
         ArrayList<Integer> ai_move = Minimax(board, DEPTH, -1000000, 1000000, true).moves;
@@ -80,7 +80,7 @@ public class SecondActivity extends AppCompatActivity {
         currentAiImage.setImageResource(R.drawable.red_circle);
     }
 
-    public static boolean isPieceMovable(int[] board, int counter) {
+    private static boolean isPieceMovable(int[] board, int counter) {
         boolean status = false;
         for (int index : validMoves[counter]) {
             if (board[index] == 2) {
@@ -110,15 +110,10 @@ public class SecondActivity extends AppCompatActivity {
                 countTwo++;
             }
         }
-        if (countTwo == 3) {
-            return true;
-        } else {
-            return false;
-        }
+        return countTwo == 3;
     }
 
     private void aiMove(){
-        android.support.v7.widget.GridLayout parentView = findViewById(R.id.gridLayout);
         ArrayList<Integer> ai_move = Minimax(board, DEPTH, -1000000, 1000000, true).moves;
         ImageView previousAiImage = parentView.findViewWithTag(ai_move.get(0) + "");
         board[ai_move.get(0)] = 2;
@@ -129,7 +124,6 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void playerMove(int tappedCounter, int pickedTappedCounter){
-        android.support.v7.widget.GridLayout parentView = findViewById(R.id.gridLayout);
         board[tappedCounter] = 2;
         board[pickedTappedCounter] = player;
         ImageView lastImage = parentView.findViewWithTag(tappedCounter + "");
@@ -153,20 +147,17 @@ public class SecondActivity extends AppCompatActivity {
         return new ArrayList<>(Arrays.asList(false, null));
     }
 
-    private void checkGameCondition(View view, int[] board){
-        for (int[] winningPosition : winningPositions) {
+    private void checkGameCondition(int[] board){
+        for (int[] winningPosition : winningPositions)
             if (board[winningPosition[0]] == board[winningPosition[1]]
                     && board[winningPosition[1]] == board[winningPosition[2]]
                     && board[winningPosition[0]] != 2) {
-                String winner = "AI won!";
+                String winner = "   AI won!";
                 gameIsActive = false;
                 if (board[winningPosition[0]] == 0) {
                     winner = "You won!";
                 }
-                TextView winnerMessage = findViewById(R.id.winnerMessage);
-                winnerMessage.setText(winner);
-                LinearLayout layout = findViewById(R.id.playAgainLayout);
-                layout.setVisibility(view.VISIBLE);
+                showGameOver(winner);
             } else {
                 boolean gameIsOver = true;
 
@@ -181,14 +172,13 @@ public class SecondActivity extends AppCompatActivity {
                     layout.setVisibility(View.VISIBLE);
                 }
             }
-        }
     }
 
-    private void showGameOver(View view){
+    private void showGameOver(String winMessageContent){
         TextView winnerMessage = findViewById(R.id.winnerMessage);
-        winnerMessage.setText("Someone has won!");
+        winnerMessage.setText(winMessageContent);
         LinearLayout layout = findViewById(R.id.playAgainLayout);
-        layout.setVisibility(view.VISIBLE);
+        layout.setVisibility(View.VISIBLE);
     }
 
     public void playAgain(View view) {
@@ -210,7 +200,6 @@ public class SecondActivity extends AppCompatActivity {
         finish();
     }
 
-
     private View.OnTouchListener handleTouch = new View.OnTouchListener() {
         int dx, dy;
 
@@ -219,7 +208,6 @@ public class SecondActivity extends AppCompatActivity {
         public boolean onTouch(View view, MotionEvent event) {
 
             ImageView counter = (ImageView) view;
-            android.support.v7.widget.GridLayout parentView = findViewById(R.id.gridLayout);
             int tappedCounter = Integer.parseInt(counter.getTag().toString());
 
             switch (event.getAction()) {
@@ -231,11 +219,11 @@ public class SecondActivity extends AppCompatActivity {
                     ix = (int) event.getRawX();
                     iy = (int) event.getRawY();
 
-                    if (!isBoardEmpty(board)) {
+                    width = one.getWidth() / 2;
+
+                    if (coords.size() == 9) {
                         break;
                     }
-
-                    width = one.getWidth() / 2;
 
                     for (int i = 0; i < parentView.getChildCount(); i++) {
                         View currentView = parentView.findViewWithTag(i + "");
@@ -278,9 +266,12 @@ public class SecondActivity extends AppCompatActivity {
                     if (canMove(board)) {
 
                         if (pickedTappedCounter == -1) {
+
                             counter.animate().x(ix + dx).y(iy + dy).setDuration(0).start();
                             return true;
+
                         } else if (board[pickedTappedCounter] == 2) {
+
                             if (!isValidMove(tappedCounter, pickedTappedCounter)){
                                 counter.animate().x(ix + dx).y(iy + dy).setDuration(0).start();
                                 return true;
@@ -288,9 +279,7 @@ public class SecondActivity extends AppCompatActivity {
 
                             playerMove(tappedCounter, pickedTappedCounter);
 
-                            if ((Boolean) isGameOver(board).get(0)) {
-                                showGameOver(view);
-                            } else {
+                            if (!(Boolean) isGameOver(board).get(0)) {
                                 aiMove();
                             }
                         }
@@ -298,7 +287,7 @@ public class SecondActivity extends AppCompatActivity {
                     counter.animate().x(ix + dx).y(iy + dy).setDuration(0).start();
                     break;
             }
-            checkGameCondition(view, board);
+            checkGameCondition(board);
             return true;
         }
     };
@@ -326,6 +315,7 @@ public class SecondActivity extends AppCompatActivity {
         eight.setOnTouchListener(handleTouch);
         nine = findViewById(R.id.nine);
         nine.setOnTouchListener(handleTouch);
+        parentView = findViewById(R.id.gridLayout);
 
         Intent intent = getIntent();
         switch (intent.getStringExtra("name")) {

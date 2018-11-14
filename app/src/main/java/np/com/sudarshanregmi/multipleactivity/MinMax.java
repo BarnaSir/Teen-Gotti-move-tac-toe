@@ -3,12 +3,13 @@ package np.com.sudarshanregmi.multipleactivity;
 import java.util.ArrayList;
 
 import static np.com.sudarshanregmi.multipleactivity.SecondActivity.DEPTH;
-import static np.com.sudarshanregmi.multipleactivity.SecondActivity.best_move;
 import static np.com.sudarshanregmi.multipleactivity.SecondActivity.canMove;
 import static np.com.sudarshanregmi.multipleactivity.SecondActivity.isGameOver;
 import static np.com.sudarshanregmi.multipleactivity.SecondActivity.validMoves;
 
 public final class MinMax {
+
+    private static ArrayList<Integer> best_move = new ArrayList<>();
     public int value;
     public ArrayList<Integer> moves;
 
