@@ -1,6 +1,6 @@
-#Teen Gotti (Move-Tac-Toe)
+# Teen Gotti (Move-Tac-Toe)
 
-##Demo Video
+## Demo Video
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/akpqwGDPMx8/0.jpg)](http://www.youtube.com/watch?v=akpqwGDPMx8)
 
@@ -15,14 +15,7 @@ Here, user plays against AI. AI generates the move using Minimax algorithm.
 
 ---
 
-
 | Default config      |         API               |
 | ------------------- |:-------------------------:| 
 | Minimum SDK Version | 21, Android 5.0 (Lollipop)|
-| Maximum SDK Version | 28, Android 9.0 (Pie)     |
-
-
-
-
-
-
+| Target SDK Version  | 28, Android 9.0 (Pie)     |
