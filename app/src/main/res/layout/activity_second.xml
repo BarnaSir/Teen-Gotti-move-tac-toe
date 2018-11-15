@@ -8,6 +8,7 @@
     tools:context=".SecondActivity">
 
     <android.support.v7.widget.GridLayout
+        android:animateLayoutChanges="true"
         android:id="@+id/gridLayout"
         android:layout_width="300dp"
         android:layout_height="300dp"

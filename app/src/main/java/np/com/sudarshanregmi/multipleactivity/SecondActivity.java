@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static np.com.sudarshanregmi.multipleactivity.MinMax.Minimax;
 
@@ -47,13 +48,19 @@ public class SecondActivity extends AppCompatActivity {
     private int getNearestNode(float x, float y) {
         int index = -1;
         int temp = 1000000;
+        System.out.println("ERROR=> "+coords);
         System.out.println("width is "+width);
-        for (int i = 0; i < coords.size(); i++) {
-            int distance = (int) Math.hypot(x - coords.get(i).get(0) - width, y - coords.get(i).get(1) - width);
-            System.out.println("current distance "+distance);
-            if (distance < temp) {
-                temp = distance;
-                index = i;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                int i = row*3+col;
+                int effectiveWidthX = col*width;
+                int effectiveWidthY = row*width;
+                System.out.println("EFFECTIVE WIDTH for "+i+" "+effectiveWidthX+", "+effectiveWidthY);
+                int distance = (int) Math.hypot(x - coords.get(i).get(0) - effectiveWidthX, y - coords.get(i).get(1) - effectiveWidthY);
+                if (distance < temp && distance<150) {
+                    temp = distance;
+                    index = i;
+                }
             }
         }
         System.out.println(temp+" is distance"+" index=> "+index);
@@ -73,11 +80,11 @@ public class SecondActivity extends AppCompatActivity {
 
     private void fillBoard(int tappedCounter, ImageView counter){
         board[tappedCounter] = player;
-        counter.setImageResource(R.drawable.blue_circle);
+        counter.setImageResource(R.drawable.white_marbel);
         ArrayList<Integer> ai_move = Minimax(board, DEPTH, -1000000, 1000000, true).moves;
         ImageView currentAiImage = parentView.findViewWithTag(ai_move.get(0) + "");
         board[ai_move.get(0)] = 1;
-        currentAiImage.setImageResource(R.drawable.red_circle);
+        currentAiImage.setImageResource(R.drawable.black_marbel);
     }
 
     private static boolean isPieceMovable(int[] board, int counter) {
@@ -96,7 +103,7 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private boolean canFillPieces(int tappedCounter){
-        return board[tappedCounter] == 2 && gameIsActive && !canMove(board);
+        return board[tappedCounter] == 2 && !canMove(board);
     }
 
     private boolean isImmovable(int tappedCounter){
@@ -104,13 +111,13 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     public static boolean canMove(int[] board) {
-        int countTwo = 0;
+        int count = 0;
         for (int i : board) {
             if (i == 2) {
-                countTwo++;
+                count++;
             }
         }
-        return countTwo == 3;
+        return count == 3;
     }
 
     private void aiMove(){
@@ -120,7 +127,7 @@ public class SecondActivity extends AppCompatActivity {
         board[ai_move.get(1)] = 1;
         previousAiImage.setImageResource(0);
         ImageView nextAiImage = parentView.findViewWithTag(ai_move.get(1) + "");
-        nextAiImage.setImageResource(R.drawable.red_circle);
+        nextAiImage.setImageResource(R.drawable.black_marbel);
     }
 
     private void playerMove(int tappedCounter, int pickedTappedCounter){
@@ -129,7 +136,7 @@ public class SecondActivity extends AppCompatActivity {
         ImageView lastImage = parentView.findViewWithTag(tappedCounter + "");
         lastImage.setImageResource(0);
         ImageView setImage = parentView.findViewWithTag(pickedTappedCounter + "");
-        setImage.setImageResource(R.drawable.blue_circle);
+        setImage.setImageResource(R.drawable.white_marbel);
     }
 
     public static ArrayList isGameOver(int[] board) {
@@ -210,6 +217,28 @@ public class SecondActivity extends AppCompatActivity {
             ImageView counter = (ImageView) view;
             int tappedCounter = Integer.parseInt(counter.getTag().toString());
 
+            if (!gameIsActive){
+                return false;
+            }
+
+            for (int i = 0; i < parentView.getChildCount(); i++) {
+                width = one.getWidth() / 2;
+                if (coords.size() == 9) {
+                    break;
+                }
+                View currentView = parentView.findViewWithTag(i + "");
+                int[] location = new int[2];
+                ArrayList<Integer> temp = new ArrayList<>();
+                currentView.getLocationOnScreen(location);
+                temp.add(location[0]);
+                temp.add(location[1]);
+                coords.add(temp);
+            }
+
+            if(getNearestNode(event.getRawX(), event.getRawY())==-1 && !canMove(board)){
+                return true;
+            }
+
             switch (event.getAction()) {
 
                 case MotionEvent.ACTION_DOWN:
@@ -219,21 +248,6 @@ public class SecondActivity extends AppCompatActivity {
                     ix = (int) event.getRawX();
                     iy = (int) event.getRawY();
 
-                    width = one.getWidth() / 2;
-
-                    if (coords.size() == 9) {
-                        break;
-                    }
-
-                    for (int i = 0; i < parentView.getChildCount(); i++) {
-                        View currentView = parentView.findViewWithTag(i + "");
-                        int[] location = new int[2];
-                        ArrayList<Integer> temp = new ArrayList<>();
-                        currentView.getLocationOnScreen(location);
-                        temp.add(location[0]);
-                        temp.add(location[1]);
-                        coords.add(temp);
-                    }
                     break;
 
                 case MotionEvent.ACTION_MOVE:

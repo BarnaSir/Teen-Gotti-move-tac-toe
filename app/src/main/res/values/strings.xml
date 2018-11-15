@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Move Tac Toe</string>
+    <string name="ai_win">   AI won!!</string>
+    <string name="human_win">Human won!!</string>
 </resources>
