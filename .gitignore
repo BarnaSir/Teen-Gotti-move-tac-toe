@@ -2,7 +2,7 @@
 *.apk
 *.ap_
 *.aab
-!MoveTacToe.apk
+!MoveTacToe_v2.apk
 # Files for the ART/Dalvik VM
 *.dex
 
