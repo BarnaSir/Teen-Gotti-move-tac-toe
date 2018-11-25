@@ -17,5 +17,5 @@ Here, user plays against AI. AI generates the move using Minimax algorithm.
 
 | Default config      |         API               |
 | ------------------- |:-------------------------:| 
-| Minimum SDK Version | 19, Kitkat 4.4 (Kitkat)|
-| Target SDK Version  | 28, Android 9.0 (Pie)     |
+| Minimum SDK Version | 21, Kitkat 5.0 (Lollipop)|
+| Target SDK Version  | 28, Android 9.0 (Pie)|
