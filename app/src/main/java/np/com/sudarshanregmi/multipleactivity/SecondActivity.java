@@ -47,14 +47,11 @@ public class SecondActivity extends AppCompatActivity {
     private int getNearestNode(float x, float y) {
         int index = -1;
         int temp = 1000000;
-        System.out.println("ERROR=> "+coords);
-        System.out.println("width is "+width);
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 int i = row*3+col;
                 int effectiveWidthX = col*width;
                 int effectiveWidthY = row*width;
-                System.out.println("EFFECTIVE WIDTH for "+i+" "+effectiveWidthX+", "+effectiveWidthY);
                 int distance = (int) Math.hypot(x - coords.get(i).get(0) - effectiveWidthX, y - coords.get(i).get(1) - effectiveWidthY);
                 if (distance < temp && distance<150) {
                     temp = distance;
@@ -217,6 +214,10 @@ public class SecondActivity extends AppCompatActivity {
             int tappedCounter = Integer.parseInt(counter.getTag().toString());
 
             if (!gameIsActive){
+                return false;
+            }
+
+            if(canMove(board) && (pickedTappedCounter==-1 || board[tappedCounter]==2)){
                 return false;
             }
 
